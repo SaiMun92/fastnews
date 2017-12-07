@@ -1,0 +1,27 @@
+{
+  "name": "fast-news",
+  "version": "1.0.0",
+  "description": "A quick platform to get your daily news instantly",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "server": "nodemon index.js",
+    "client": "npm run start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "compression": "^1.7.1",
+    "concurrently": "^3.5.1",
+    "express": "^4.16.2",
+    "localtunnel": "^1.8.3",
+    "mongoose": "^4.13.5",
+    "nodemon": "^1.12.1",
+    "path": "^0.12.7",
+    "request": "^2.83.0",
+    "snoowrap": "^1.15.1",
+    "whatwg-fetch": "^2.0.3"
+  }
+}
