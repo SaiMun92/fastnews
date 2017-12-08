@@ -96,7 +96,7 @@ setInterval(() => {
 }, 60000);
 
 // expose the end-points by sending the object stories
-app.get("/worldnews", (req, res) => {
+app.get('/worldnews', (req, res) => {
   res.send({ stories });
 });
 

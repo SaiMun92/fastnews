@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
-import axios from 'axios';
 import browser from 'detect-browser';
+import 'whatwg-fetch';
+// import axios from 'axios';
+import React, { Component } from "react";
 import Masonry from 'react-masonry-component';
-import styled, { injectGlobal } from 'styled-components';
-import Ad from './Ad';
-import Offline from './Offline';
-import Story from './Story';
-import Background from './handmadepaper.png';
+import styled, { injectGlobal } from "styled-components";
+import Offline from "./Offline";
+import Story from "./Story";
+import Background from "./handmadepaper.png";
 
 const black = "#2a2626";
 
@@ -36,17 +36,21 @@ injectGlobal`
     font-family: 'Times New Roman', serif;
     font-weight: 300;
     margin: 0 6.25vw;
+
     @media (min-width: 640px) {
       margin: 0 3.125vw;
     }
+
     @media (min-width: 1650px) {
       margin: 0 calc((100vw - 1650px) / 2 + 50px);
     }
   }
+
   @media (min-width: 640px) {
     .gutter-sizer {
       width: 6.66%;
     }
+
     .grid-sizer {
       width: 46.66%;
     }
@@ -56,10 +60,12 @@ injectGlobal`
     .gutter-sizer {
       width: 3.22%;
     }
+
     .grid-sizer {
       width: 22.58%;
     }
   }
+
   section {
     margin-bottom: 5.8vw;
     width: 100%;
@@ -72,6 +78,7 @@ injectGlobal`
     @media (min-width: 1056px) {
       margin-bottom: 2.25vw;
       width: 22.58%;
+
       &.double {
         width: 48.387%;
       }
@@ -91,6 +98,7 @@ const Bar = styled.div`
 
 const Medium = styled.p`
   display: none;
+
   @media (min-width: 640px) {
     display: initial;
   }
@@ -100,6 +108,7 @@ const Subheader = styled.div`
   display: flex;
   font-size: .875rem;
   justify-content: space-between;
+
   a, p {
     color: ${black};
     text-decoration: none;
@@ -127,23 +136,165 @@ const Title = styled.h1`
   }
 `;
 
-
 class App extends Component {
-  constructor(props) {
-    super(props);
+  state = {
+    browser: null,
+    fetching: true,
+    offline: false,
+    stories: [],
+    usingExtension: null,
+  };
 
-    this.state = {
-      browser: null,
-      fetching: true,
-      offline: false,
-      stories: [],
-      usingExtension: null
-    }
+  componentDidMount() {
+    this.setState({
+      browser: browser.name,
+      usingExtension: window.self !== window.top,
+      version: parseFloat(browser.version),
+    });
+    this.getStories();
+    window.addEventListener("offline", this.toggleConnection);
+    window.addEventListener("online", this.toggleConnection);
+
+    // if (window.location.hostname !== 'localhost') {
+    //   ReactGA.initialize('UA-43808769-9');
+    //   ReactGA.pageview('pageview');
+    // }
   }
+
+  getStories = () => {
+    if (
+      storageAvailable("localStorage") &&
+      !navigator.onLine &&
+      localStorage.getItem("stories") !== null
+    ) {
+      // Offline, but should have old stories to share
+      this.setState({
+        fetching: false,
+        offline: true,
+        stories: JSON.parse(localStorage.getItem("stories"))
+      });
+    } else {
+      fetch('/worldnews').then(response => response.json()).then(response => {
+        console.log(response);
+        const stories = response.stories
+          .filter(
+            (thing, index, self) =>
+              self.findIndex(t => t.id === thing.id) === index
+          )
+          .sort((a, b) => a.position - b.position);
+
+        this.setState({
+          fetching: false,
+          offline: false,
+          stories
+        });
+
+        if (storageAvailable("localStorage")) {
+          localStorage.setItem("stories", JSON.stringify(stories));
+        }
+      });
+    }
+  };
+
+  toggleConnection = connected => {
+    if (navigator.onLine) {
+      this.getStories();
+    } else {
+      this.setState({ offline: true });
+    }
+  };
+
   render() {
     return (
-      <div className="App">
-        Hello world
+      <div>
+        <Title>The Global Upvote</Title>
+        <Bar>
+          <Subheader>
+            <Medium>
+              <a href="http://www.saimun92.github.io">Lee Sai Mun</a>
+            </Medium>
+            <Tagline>
+              Top voted stories across the web, summarized and updated every sixty seconds.
+            </Tagline>
+            <Medium>
+              <a href="https://www.reddit.com/r/worldnews/">WorldNews</a>
+              ,
+              {" "}
+              <a href="https://www.reddit.com">Reddit</a>
+            </Medium>
+          </Subheader>
+          <Offline black={black} offline={this.state.offline} />
+        </Bar>
+        <Masonry
+          options={{
+            columnWidth: '.grid-sizer',
+            gutter: '.gutter-sizer',
+            percentPosition: true,
+            transitionDuration: 0,
+          }}
+          updateOnEachImageLoad={true}
+        >
+          <div className="grid-sizer" />
+          <div className="gutter-sizer" />
+          <Story
+            fetching={this.state.fetching}
+            thumbnail
+            {...this.state.stories[0]}
+          />
+          <Story
+            double
+            fetching={this.state.fetching}
+            {...this.state.stories[1]}
+          />
+          <Story
+            fetching={this.state.fetching}
+            {...this.state.stories[2]}
+          />
+          <Story
+            fetching={this.state.fetching}
+            {...this.state.stories[3]}
+            />
+          <Story
+            fetching={this.state.fetching}
+            {...this.state.stories[4]}
+          />
+          <Story
+            fetching={this.state.fetching}
+            {...this.state.stories[5]}
+          />
+          <Story
+            fetching={this.state.fetching}
+            {...this.state.stories[6]}
+          />
+          <Story
+            fetching={this.state.fetching}
+            thumbnail
+            {...this.state.stories[7]}
+          />
+          <Story
+            fetching={this.state.fetching}
+            {...this.state.stories[8]}
+          />
+          <Story
+            fetching={this.state.fetching}
+            {...this.state.stories[9]}
+          />
+          <Story
+            fetching={this.state.fetching}
+            {...this.state.stories[10]}
+          />
+          {
+            this.state.stories
+            .slice(11)
+            .map((story) => (
+                <Story
+                  fetching={this.state.fetching}
+                  key={story.id}
+                  {...story}
+                />
+              ))
+          }
+        </Masonry>
       </div>
     );
   }

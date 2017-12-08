@@ -2,6 +2,11 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
+  "proxy": {
+    "/worldnews": {
+      "target": "http://localhost:8080"
+    }
+  },
   "dependencies": {
     "axios": "^0.17.1",
     "detect-browser": "^2.0.0",
@@ -12,7 +17,8 @@
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.0.17",
     "redux": "^3.7.2",
-    "styled-components": "^2.2.4"
+    "styled-components": "^2.2.4",
+    "whatwg-fetch": "^2.0.3"
   },
   "scripts": {
     "start": "react-scripts start",
