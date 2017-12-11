@@ -27,10 +27,11 @@ let stories = [];
 // const based function
 const getComments = story => {
   reddit.getSubmission(story.id).fetch().then( post => { // Gets info on a given submission
-    current += 1;
-    // console.log(post.comments);
+
     for(let comment of post.comments) { // look for the author name = autotldr (a bot that summaries articles)
       if (comment.author.name === 'autotldr') {
+        current += 1;
+        console.log("Collecting posts no. ", current);
         const description = comment.body_html.substr(
           comment.body_html.indexOf("<blockquote>") + 13,
           comment.body_html.indexOf("</blockquote>") -
@@ -55,11 +56,11 @@ const getComments = story => {
 
       // If the loop has reached the end of the array, then set current and length back to 0 and store
       // newStories array into stories variable.
-      if ( current >= length && length > 0) {
-        current = 0;
-        length = 0;
-        stories = newStories;
-      }
+      // if ( current >= length && length > 0) {
+      //   current = 0;
+      //   length = 0;
+      //   stories = newStories;
+      // }
     }
   })
   .catch( err => {
@@ -69,17 +70,17 @@ const getComments = story => {
 
 const getStories = () => {
   // get a list of hot posts on this "worldnews" subreddit (u want the id only to get the full data later on)
-  reddit.getSubreddit("worldnews").getHot({ limit: 50 }).then( posts => {
+  reddit.getSubreddit("worldnews").getTop({ time: 'day' }).then( posts => {
     newStories = [];
+    // console.log(posts);
     length = posts.length;
-
+    console.log("Length of post: ", length);
     for (var i=0; i<posts.length; i++) {
       getComments({
         ...posts[i],
         position: i,
       });
     }
-    // console.log(posts[1]);
   })
   .catch( err => {
     console.log(err);
@@ -92,12 +93,14 @@ getStories();
 
 //getStories every 60 secs
 setInterval(() => {
+  current = 0;
+  newStories = [];
   getStories();
 }, 60000);
 
 // expose the end-points by sending the object stories
 app.get('/worldnews', (req, res) => {
-  res.send({ stories });
+  res.send({ newStories });
 });
 
 // let's encrypy free certificate authority so as to enable https

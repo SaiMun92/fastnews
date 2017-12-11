@@ -1,12 +1,12 @@
 import browser from 'detect-browser';
 import 'whatwg-fetch';
-// import axios from 'axios';
 import React, { Component } from "react";
 import Masonry from 'react-masonry-component';
-import styled, { injectGlobal } from "styled-components";
+import styled, { injectGlobal } from "styled-components"; // { ThemeProvider }
 import Offline from "./Offline";
 import Story from "./Story";
-import Background from "./handmadepaper.png";
+import Background from "./assets/handmadepaper.png";
+import titleFont from './assets/OldeEnglish.ttf';
 
 const black = "#2a2626";
 
@@ -28,12 +28,13 @@ const storageAvailable = type => {
   }
 };
 
+// @media is to define different style rules for different media types
 injectGlobal`
   body {
     background: #eef1f1;
     background-image: url(${Background});
     color: ${black};
-    font-family: 'Times New Roman', serif;
+    font-family: 'Times New Roman', Times, serif;
     font-weight: 300;
     margin: 0 6.25vw;
 
@@ -90,6 +91,7 @@ injectGlobal`
   }
 `;
 
+// Bar is a react component calling the 'styled.div' function passing in the parameters
 const Bar = styled.div`
   border-bottom: 1px solid ${black};
   border-top: 1px solid ${black};
@@ -123,9 +125,15 @@ const Tagline = styled.p`
 
 const Title = styled.h1`
   font-size: 2.618rem;
-  font-weight: 900;
+  font-weight: normal;
+  font-family: TitleFont;
   margin: 0.809rem 0;
   text-align: center;
+
+  @font-face {
+    font-family: TitleFont;
+    src: url(${titleFont});
+  }
 
   @media (min-width: 320px) {
     font-size: calc( 41.888px + (109.664 - 41.888) * (100vw - 320px) / (640 - 320) );
@@ -137,13 +145,17 @@ const Title = styled.h1`
 `;
 
 class App extends Component {
-  state = {
-    browser: null,
-    fetching: true,
-    offline: false,
-    stories: [],
-    usingExtension: null,
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      browser: null,
+      fetching: true,
+      offline: false,
+      stories: [],
+      usingExtension: null,
+    };
+  }
+
 
   componentDidMount() {
     this.setState({
@@ -151,6 +163,7 @@ class App extends Component {
       usingExtension: window.self !== window.top,
       version: parseFloat(browser.version),
     });
+
     this.getStories();
     window.addEventListener("offline", this.toggleConnection);
     window.addEventListener("online", this.toggleConnection);
@@ -175,13 +188,14 @@ class App extends Component {
       });
     } else {
       fetch('/worldnews').then(response => response.json()).then(response => {
-        console.log(response);
-        const stories = response.stories
+        console.log("Before:", response);
+        const stories = response.newStories
           .filter(
             (thing, index, self) =>
               self.findIndex(t => t.id === thing.id) === index
           )
           .sort((a, b) => a.position - b.position);
+          console.log("After:", stories);
 
         this.setState({
           fetching: false,
@@ -197,7 +211,7 @@ class App extends Component {
   };
 
   toggleConnection = connected => {
-    if (navigator.onLine) {
+    if (navigator.onLine) { // deterimines whether the browser is online
       this.getStories();
     } else {
       this.setState({ offline: true });
@@ -207,11 +221,11 @@ class App extends Component {
   render() {
     return (
       <div>
-        <Title>The Global Upvote</Title>
+        <Title>The Fast News</Title>
         <Bar>
           <Subheader>
             <Medium>
-              <a href="http://www.saimun92.github.io">Lee Sai Mun</a>
+              <a href="https://saimun92.github.io/">Lee Sai Mun</a>
             </Medium>
             <Tagline>
               Top voted stories across the web, summarized and updated every sixty seconds.

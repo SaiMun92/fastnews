@@ -80,6 +80,7 @@ const Title = styled.h2`
 `;
 
 class Story extends Component {
+  // defaultProps will be yused to ensure that this.props.name wll have a value if it is not specified by the parent component
   static defaultProps = {
     className: "",
     description: "",
@@ -124,11 +125,6 @@ class Story extends Component {
             <Right>
               <ReadMore
                 href={this.props.url}
-                // onClick={() => {ReactGA.event({
-                //   category: 'story',
-                //   action: 'click',
-                //   label: this.props.url
-                // })}}
               >
                 Read more at {this.props.domain}
               </ReadMore>
