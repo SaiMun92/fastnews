@@ -7,7 +7,7 @@ const path = require('path'); // this module provides utilities for working with
 const request = require('request');
 
 const app = express();
-const keys = require('./keys.json');
+const keys = require('./config/keys');
 const port = process.env.PORT || 8080;
 const snoowrap = require('snoowrap');
 
