@@ -31,7 +31,7 @@ const getComments = story => {
     for(let comment of post.comments) { // look for the author name = autotldr (a bot that summaries articles)
       if (comment.author.name === 'autotldr') {
         current += 1;
-        console.log("Collecting posts no. ", current);
+        console.log("Collecting posts no. that contains autotldr", current);
         const description = comment.body_html.substr(
           comment.body_html.indexOf("<blockquote>") + 13,
           comment.body_html.indexOf("</blockquote>") -
@@ -74,7 +74,7 @@ const getStories = () => {
     newStories = [];
     // console.log(posts);
     length = posts.length;
-    console.log("Length of post: ", length);
+    console.log("Length of post collected: ", length);
     for (var i=0; i<posts.length; i++) {
       getComments({
         ...posts[i],
